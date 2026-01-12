@@ -1,6 +1,6 @@
 //
-//  RetailyApp.swift
-//  Retaily
+//  RetainlyApp.swift
+//  Retainly
 //
 //  Created by Rahul Shah on 12/01/2026.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct RetailyApp: App {
+struct RetainlyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

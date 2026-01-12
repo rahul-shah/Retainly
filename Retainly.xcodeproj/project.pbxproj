@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		55454E282F1521CD00A26DCF /* RetainlyShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 55454E1E2F1521CD00A26DCF /* RetainlyShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		55454DF62F15198200A26DCF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,28 +25,78 @@
 			remoteGlobalIDString = 55454DE72F15198100A26DCF;
 			remoteInfo = Retaily;
 		};
+		55454E262F1521CD00A26DCF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 55454DE02F15198100A26DCF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55454E1D2F1521CC00A26DCF;
+			remoteInfo = RetailyShareExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		55454E2D2F1521CD00A26DCF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				55454E282F1521CD00A26DCF /* RetainlyShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		55454DE82F15198100A26DCF /* Retaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Retaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		55454DF52F15198200A26DCF /* RetailyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetailyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		55454DFF2F15198200A26DCF /* RetailyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetailyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		55454DE82F15198100A26DCF /* Retainly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Retainly.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55454DF52F15198200A26DCF /* RetainlyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetainlyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		55454DFF2F15198200A26DCF /* RetainlyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetainlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		55454E1E2F1521CD00A26DCF /* RetainlyShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RetainlyShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		55454E292F1521CD00A26DCF /* Exceptions for "RetainlyShareExtension" folder in "RetainlyShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 55454E1D2F1521CC00A26DCF /* RetainlyShareExtension */;
+		};
+		55454E332F1524D100A26DCF /* Exceptions for "Retainly" folder in "RetainlyShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SavedLink.swift,
+			);
+			target = 55454E1D2F1521CC00A26DCF /* RetainlyShareExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		55454DEA2F15198100A26DCF /* Retaily */ = {
+		55454DEA2F15198100A26DCF /* Retainly */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Retaily;
+			exceptions = (
+				55454E332F1524D100A26DCF /* Exceptions for "Retainly" folder in "RetainlyShareExtension" target */,
+			);
+			path = Retainly;
 			sourceTree = "<group>";
 		};
-		55454DF82F15198200A26DCF /* RetailyTests */ = {
+		55454DF82F15198200A26DCF /* RetainlyTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RetailyTests;
+			path = RetainlyTests;
 			sourceTree = "<group>";
 		};
-		55454E022F15198200A26DCF /* RetailyUITests */ = {
+		55454E022F15198200A26DCF /* RetainlyUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RetailyUITests;
+			path = RetainlyUITests;
+			sourceTree = "<group>";
+		};
+		55454E1F2F1521CD00A26DCF /* RetainlyShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				55454E292F1521CD00A26DCF /* Exceptions for "RetainlyShareExtension" folder in "RetainlyShareExtension" target */,
+			);
+			path = RetainlyShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,15 +123,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		55454E1B2F1521CC00A26DCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		55454DDF2F15198100A26DCF = {
 			isa = PBXGroup;
 			children = (
-				55454DEA2F15198100A26DCF /* Retaily */,
-				55454DF82F15198200A26DCF /* RetailyTests */,
-				55454E022F15198200A26DCF /* RetailyUITests */,
+				55454DEA2F15198100A26DCF /* Retainly */,
+				55454DF82F15198200A26DCF /* RetainlyTests */,
+				55454E022F15198200A26DCF /* RetainlyUITests */,
+				55454E1F2F1521CD00A26DCF /* RetainlyShareExtension */,
 				55454DE92F15198100A26DCF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +147,10 @@
 		55454DE92F15198100A26DCF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				55454DE82F15198100A26DCF /* Retaily.app */,
-				55454DF52F15198200A26DCF /* RetailyTests.xctest */,
-				55454DFF2F15198200A26DCF /* RetailyUITests.xctest */,
+				55454DE82F15198100A26DCF /* Retainly.app */,
+				55454DF52F15198200A26DCF /* RetainlyTests.xctest */,
+				55454DFF2F15198200A26DCF /* RetainlyUITests.xctest */,
+				55454E1E2F1521CD00A26DCF /* RetainlyShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,31 +158,33 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		55454DE72F15198100A26DCF /* Retaily */ = {
+		55454DE72F15198100A26DCF /* Retainly */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55454E092F15198200A26DCF /* Build configuration list for PBXNativeTarget "Retaily" */;
+			buildConfigurationList = 55454E092F15198200A26DCF /* Build configuration list for PBXNativeTarget "Retainly" */;
 			buildPhases = (
 				55454DE42F15198100A26DCF /* Sources */,
 				55454DE52F15198100A26DCF /* Frameworks */,
 				55454DE62F15198100A26DCF /* Resources */,
+				55454E2D2F1521CD00A26DCF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				55454E272F1521CD00A26DCF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				55454DEA2F15198100A26DCF /* Retaily */,
+				55454DEA2F15198100A26DCF /* Retainly */,
 			);
-			name = Retaily;
+			name = Retainly;
 			packageProductDependencies = (
 			);
 			productName = Retaily;
-			productReference = 55454DE82F15198100A26DCF /* Retaily.app */;
+			productReference = 55454DE82F15198100A26DCF /* Retainly.app */;
 			productType = "com.apple.product-type.application";
 		};
-		55454DF42F15198200A26DCF /* RetailyTests */ = {
+		55454DF42F15198200A26DCF /* RetainlyTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55454E0C2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetailyTests" */;
+			buildConfigurationList = 55454E0C2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetainlyTests" */;
 			buildPhases = (
 				55454DF12F15198200A26DCF /* Sources */,
 				55454DF22F15198200A26DCF /* Frameworks */,
@@ -131,18 +196,18 @@
 				55454DF72F15198200A26DCF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				55454DF82F15198200A26DCF /* RetailyTests */,
+				55454DF82F15198200A26DCF /* RetainlyTests */,
 			);
-			name = RetailyTests;
+			name = RetainlyTests;
 			packageProductDependencies = (
 			);
 			productName = RetailyTests;
-			productReference = 55454DF52F15198200A26DCF /* RetailyTests.xctest */;
+			productReference = 55454DF52F15198200A26DCF /* RetainlyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		55454DFE2F15198200A26DCF /* RetailyUITests */ = {
+		55454DFE2F15198200A26DCF /* RetainlyUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55454E0F2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetailyUITests" */;
+			buildConfigurationList = 55454E0F2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetainlyUITests" */;
 			buildPhases = (
 				55454DFB2F15198200A26DCF /* Sources */,
 				55454DFC2F15198200A26DCF /* Frameworks */,
@@ -154,14 +219,36 @@
 				55454E012F15198200A26DCF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				55454E022F15198200A26DCF /* RetailyUITests */,
+				55454E022F15198200A26DCF /* RetainlyUITests */,
 			);
-			name = RetailyUITests;
+			name = RetainlyUITests;
 			packageProductDependencies = (
 			);
 			productName = RetailyUITests;
-			productReference = 55454DFF2F15198200A26DCF /* RetailyUITests.xctest */;
+			productReference = 55454DFF2F15198200A26DCF /* RetainlyUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		55454E1D2F1521CC00A26DCF /* RetainlyShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55454E2A2F1521CD00A26DCF /* Build configuration list for PBXNativeTarget "RetainlyShareExtension" */;
+			buildPhases = (
+				55454E1A2F1521CC00A26DCF /* Sources */,
+				55454E1B2F1521CC00A26DCF /* Frameworks */,
+				55454E1C2F1521CC00A26DCF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				55454E1F2F1521CD00A26DCF /* RetainlyShareExtension */,
+			);
+			name = RetainlyShareExtension;
+			packageProductDependencies = (
+			);
+			productName = RetailyShareExtension;
+			productReference = 55454E1E2F1521CD00A26DCF /* RetainlyShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -184,9 +271,12 @@
 						CreatedOnToolsVersion = 26.2;
 						TestTargetID = 55454DE72F15198100A26DCF;
 					};
+					55454E1D2F1521CC00A26DCF = {
+						CreatedOnToolsVersion = 26.2;
+					};
 				};
 			};
-			buildConfigurationList = 55454DE32F15198100A26DCF /* Build configuration list for PBXProject "Retaily" */;
+			buildConfigurationList = 55454DE32F15198100A26DCF /* Build configuration list for PBXProject "Retainly" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +290,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				55454DE72F15198100A26DCF /* Retaily */,
-				55454DF42F15198200A26DCF /* RetailyTests */,
-				55454DFE2F15198200A26DCF /* RetailyUITests */,
+				55454DE72F15198100A26DCF /* Retainly */,
+				55454DF42F15198200A26DCF /* RetainlyTests */,
+				55454DFE2F15198200A26DCF /* RetainlyUITests */,
+				55454E1D2F1521CC00A26DCF /* RetainlyShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +314,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		55454DFD2F15198200A26DCF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55454E1C2F1521CC00A26DCF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,18 +351,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		55454E1A2F1521CC00A26DCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		55454DF72F15198200A26DCF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 55454DE72F15198100A26DCF /* Retaily */;
+			target = 55454DE72F15198100A26DCF /* Retainly */;
 			targetProxy = 55454DF62F15198200A26DCF /* PBXContainerItemProxy */;
 		};
 		55454E012F15198200A26DCF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 55454DE72F15198100A26DCF /* Retaily */;
+			target = 55454DE72F15198100A26DCF /* Retainly */;
 			targetProxy = 55454E002F15198200A26DCF /* PBXContainerItemProxy */;
+		};
+		55454E272F1521CD00A26DCF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55454E1D2F1521CC00A26DCF /* RetainlyShareExtension */;
+			targetProxy = 55454E262F1521CD00A26DCF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -388,8 +498,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Retainly/Retainly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGP8RQ9PKF;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -409,7 +521,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retaily;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retainly;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -430,8 +542,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Retainly/Retainly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGP8RQ9PKF;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -451,7 +565,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retaily;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retainly;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -487,7 +601,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Retaily.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Retaily";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Retainly.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Retainly";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Debug;
@@ -512,7 +626,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Retaily.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Retaily";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Retainly.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Retainly";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
@@ -565,10 +679,73 @@
 			};
 			name = Release;
 		};
+		55454E2B2F1521CD00A26DCF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RetainlyShareExtension/RetainlyShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGP8RQ9PKF;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RetainlyShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetainlyShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retainly.RetainlyShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		55454E2C2F1521CD00A26DCF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RetainlyShareExtension/RetainlyShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGP8RQ9PKF;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RetainlyShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RetainlyShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biscuitsltd.Retainly.RetainlyShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		55454DE32F15198100A26DCF /* Build configuration list for PBXProject "Retaily" */ = {
+		55454DE32F15198100A26DCF /* Build configuration list for PBXProject "Retainly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55454E072F15198200A26DCF /* Debug */,
@@ -577,7 +754,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		55454E092F15198200A26DCF /* Build configuration list for PBXNativeTarget "Retaily" */ = {
+		55454E092F15198200A26DCF /* Build configuration list for PBXNativeTarget "Retainly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55454E0A2F15198200A26DCF /* Debug */,
@@ -586,7 +763,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		55454E0C2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetailyTests" */ = {
+		55454E0C2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetainlyTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55454E0D2F15198200A26DCF /* Debug */,
@@ -595,11 +772,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		55454E0F2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetailyUITests" */ = {
+		55454E0F2F15198200A26DCF /* Build configuration list for PBXNativeTarget "RetainlyUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55454E102F15198200A26DCF /* Debug */,
 				55454E112F15198200A26DCF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		55454E2A2F1521CD00A26DCF /* Build configuration list for PBXNativeTarget "RetainlyShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55454E2B2F1521CD00A26DCF /* Debug */,
+				55454E2C2F1521CD00A26DCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

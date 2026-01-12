@@ -1,13 +1,13 @@
 //
-//  RetailyUITestsLaunchTests.swift
-//  RetailyUITests
+//  RetainlyUITestsLaunchTests.swift
+//  RetainlyUITests
 //
 //  Created by Rahul Shah on 12/01/2026.
 //
 
 import XCTest
 
-final class RetailyUITestsLaunchTests: XCTestCase {
+final class RetainlyUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true
