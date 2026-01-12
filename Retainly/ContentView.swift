@@ -44,6 +44,13 @@ struct ContentView: View {
                     } label: {
                         Label("Debug Info", systemImage: "ladybug")
                     }
+
+                    Button {
+                        print("🔄 Manual refresh triggered")
+                        linkStore.loadLinks()
+                    } label: {
+                        Label("Refresh Links", systemImage: "arrow.clockwise")
+                    }
                 }
             }
             .navigationTitle("Retainly")

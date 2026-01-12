@@ -10,6 +10,7 @@ import SwiftUI
 struct CategoryDetailView: View {
     let category: SidebarCategory
     @ObservedObject var linkStore: LinkStore
+    @State private var selectedLink: SavedLink?
 
     var filteredLinks: [SavedLink] {
         linkStore.filteredLinks(for: category)
@@ -22,8 +23,13 @@ struct CategoryDetailView: View {
             } else {
                 List {
                     ForEach(filteredLinks) { link in
-                        LinkRowView(link: link)
-                            .listRowSeparator(.visible)
+                        Button {
+                            selectedLink = link
+                        } label: {
+                            LinkRowView(link: link)
+                        }
+                        .buttonStyle(.plain)
+                        .listRowSeparator(.visible)
                     }
                 }
                 .listStyle(.plain)
@@ -35,6 +41,9 @@ struct CategoryDetailView: View {
         #endif
         .refreshable {
             linkStore.loadLinks()
+        }
+        .sheet(item: $selectedLink) { link in
+            WebViewContainer(link: link, linkStore: linkStore)
         }
     }
 

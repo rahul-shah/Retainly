@@ -10,8 +10,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
-    private let appGroupIdentifier = "group.com.rahul.retainly"
     private let linksKey = "savedLinks"
+    private let iCloudStore = NSUbiquitousKeyValueStore.default
 
     private let messageLabel: UILabel = {
         let label = UILabel()
@@ -137,37 +137,51 @@ class ShareViewController: UIViewController {
             isRead: false
         )
 
-        // Save to UserDefaults
-        guard let userDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
-            print("Failed to access App Group: \(appGroupIdentifier)")
-            await MainActor.run {
-                showError("Failed to save")
-            }
-            return
-        }
+        // Save to iCloud
+        print("📱 Attempting to save to iCloud...")
+
+        // Force synchronize before reading
+        let syncResult = iCloudStore.synchronize()
+        print("iCloud sync before read: \(syncResult)")
 
         var links: [SavedLink] = []
-        if let data = userDefaults.data(forKey: linksKey),
-           let decodedLinks = try? JSONDecoder().decode([SavedLink].self, from: data) {
-            links = decodedLinks
-            print("Loaded \(links.count) existing links")
+        if let data = iCloudStore.data(forKey: linksKey) {
+            print("✓ Found existing data in iCloud (\(data.count) bytes)")
+
+            do {
+                let decodedLinks = try JSONDecoder().decode([SavedLink].self, from: data)
+                links = decodedLinks
+                print("✓ Loaded \(links.count) existing links from iCloud")
+            } catch {
+                print("❌ Failed to decode existing links: \(error)")
+            }
+        } else {
+            print("ℹ️ No existing data in iCloud, starting fresh")
         }
 
         links.insert(link, at: 0)
+        print("📝 New links count: \(links.count)")
 
-        if let encoded = try? JSONEncoder().encode(links) {
-            userDefaults.set(encoded, forKey: linksKey)
-            userDefaults.synchronize()
-            print("Link saved successfully: \(url)")
-            print("Total links: \(links.count)")
+        do {
+            let encoded = try JSONEncoder().encode(links)
+            print("✓ Encoded \(links.count) links (\(encoded.count) bytes)")
+
+            iCloudStore.set(encoded, forKey: linksKey)
+            print("✓ Set data in iCloud store")
+
+            let syncAfterResult = iCloudStore.synchronize()
+            print("✓ iCloud sync after write: \(syncAfterResult)")
+
+            print("✅ Link saved successfully to iCloud: \(url)")
+            print("Total links in iCloud: \(links.count)")
 
             await MainActor.run {
                 showSuccess()
             }
-        } else {
-            print("Failed to encode links")
+        } catch {
+            print("❌ Failed to encode/save links: \(error)")
             await MainActor.run {
-                showError("Failed to save")
+                showError("Failed to save: \(error.localizedDescription)")
             }
         }
     }

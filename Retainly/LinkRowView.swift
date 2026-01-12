@@ -40,6 +40,12 @@ struct LinkRowView: View {
                             .foregroundStyle(.orange)
                     }
 
+                    if link.isOfflineCached {
+                        Label("Offline", systemImage: "arrow.down.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+
                     Spacer()
 
                     Text(link.dateAdded, style: .relative)

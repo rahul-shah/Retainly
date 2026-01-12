@@ -49,52 +49,68 @@ struct DebugView: View {
     private func loadDebugInfo() {
         var info = ""
 
-        info += "App Group: \(appGroupIdentifier)\n\n"
+        info += "=== STORAGE LOCATIONS ===\n\n"
 
-        guard let userDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
-            debugInfo = "❌ Failed to access App Group UserDefaults"
-            return
-        }
+        // Check iCloud
+        info += "📱 iCloud Key-Value Store:\n"
+        let iCloudStore = NSUbiquitousKeyValueStore.default
 
-        info += "✓ App Group UserDefaults accessible\n\n"
+        // Force sync
+        let syncResult = iCloudStore.synchronize()
+        info += "Sync result: \(syncResult)\n"
 
-        // Show all keys in UserDefaults
-        let allKeys = userDefaults.dictionaryRepresentation().keys.sorted()
-        info += "All keys in UserDefaults (\(allKeys.count)):\n"
-        for key in allKeys {
-            info += "  - \(key)\n"
-        }
-        info += "\n"
+        // Check all keys in iCloud
+        let allDictionary = iCloudStore.dictionaryRepresentation
+        info += "Total keys in iCloud: \(allDictionary.keys.count)\n"
+        info += "Keys: \(allDictionary.keys.sorted().joined(separator: ", "))\n\n"
 
-        // Check for our specific key
-        info += "Looking for key: '\(linksKey)'\n\n"
+        if let iCloudData = iCloudStore.data(forKey: linksKey) {
+            info += "✓ iCloud data exists (\(iCloudData.count) bytes)\n"
 
-        if let data = userDefaults.data(forKey: linksKey) {
-            info += "✓ Data exists (\(data.count) bytes)\n\n"
+            if let links = try? JSONDecoder().decode([SavedLink].self, from: iCloudData) {
+                info += "✓ Successfully decoded \(links.count) links from iCloud\n\n"
 
-            if let links = try? JSONDecoder().decode([SavedLink].self, from: data) {
-                info += "✓ Successfully decoded \(links.count) links\n\n"
-
-                for (index, link) in links.enumerated() {
+                for (index, link) in links.prefix(5).enumerated() {
                     info += "Link \(index + 1):\n"
                     info += "  Title: \(link.title)\n"
                     info += "  URL: \(link.url.absoluteString)\n"
                     info += "  Read: \(link.isRead)\n"
-                    info += "  Date: \(link.dateAdded)\n\n"
+                    info += "  Offline: \(link.isOfflineCached)\n\n"
+                }
+
+                if links.count > 5 {
+                    info += "... and \(links.count - 5) more links\n\n"
                 }
             } else {
-                info += "❌ Failed to decode links from data\n"
-                info += "Raw data (first 100 bytes): \(String(data: data.prefix(100), encoding: .utf8) ?? "not UTF8")\n\n"
+                info += "❌ Failed to decode links from iCloud data\n\n"
             }
         } else {
-            info += "❌ No data found for key '\(linksKey)'\n\n"
-
-            // Try standard UserDefaults as fallback
-            if let standardData = UserDefaults.standard.data(forKey: linksKey) {
-                info += "⚠️ WARNING: Data found in STANDARD UserDefaults instead!\n"
-                info += "This means the Share Extension is saving to the wrong location.\n\n"
-            }
+            info += "❌ No data in iCloud for key '\(linksKey)'\n\n"
         }
+
+        // Check App Group (old storage)
+        info += "📦 App Group (Legacy):\n"
+        info += "Identifier: \(appGroupIdentifier)\n"
+
+        if let userDefaults = UserDefaults(suiteName: appGroupIdentifier) {
+            info += "✓ App Group accessible\n"
+
+            if let appGroupData = userDefaults.data(forKey: linksKey) {
+                info += "✓ Old data still exists (\(appGroupData.count) bytes)\n"
+
+                if let links = try? JSONDecoder().decode([SavedLink].self, from: appGroupData) {
+                    info += "✓ \(links.count) links in old storage (should be migrated)\n\n"
+                }
+            } else {
+                info += "✓ No old data (already migrated)\n\n"
+            }
+        } else {
+            info += "❌ Cannot access App Group\n\n"
+        }
+
+        // Migration status
+        let didMigrate = iCloudStore.bool(forKey: "didMigrateToiCloud")
+        info += "Migration Status: \(didMigrate ? "✓ Completed" : "⚠️ Not yet migrated")\n"
 
         debugInfo = info
     }
@@ -107,12 +123,10 @@ struct DebugView: View {
             isRead: false
         )
 
-        guard let userDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
-            return
-        }
-
+        let iCloudStore = NSUbiquitousKeyValueStore.default
         var links: [SavedLink] = []
-        if let data = userDefaults.data(forKey: linksKey),
+
+        if let data = iCloudStore.data(forKey: linksKey),
            let decodedLinks = try? JSONDecoder().decode([SavedLink].self, from: data) {
             links = decodedLinks
         }
@@ -120,20 +134,23 @@ struct DebugView: View {
         links.insert(testLink, at: 0)
 
         if let encoded = try? JSONEncoder().encode(links) {
-            userDefaults.set(encoded, forKey: linksKey)
-            userDefaults.synchronize()
+            iCloudStore.set(encoded, forKey: linksKey)
+            iCloudStore.synchronize()
         }
 
         loadDebugInfo()
     }
 
     private func clearAllData() {
-        guard let userDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
-            return
-        }
+        let iCloudStore = NSUbiquitousKeyValueStore.default
+        iCloudStore.removeObject(forKey: linksKey)
+        iCloudStore.synchronize()
 
-        userDefaults.removeObject(forKey: linksKey)
-        userDefaults.synchronize()
+        // Also clear old App Group data
+        if let userDefaults = UserDefaults(suiteName: appGroupIdentifier) {
+            userDefaults.removeObject(forKey: linksKey)
+            userDefaults.synchronize()
+        }
 
         loadDebugInfo()
     }

@@ -16,6 +16,7 @@ struct SavedLink: Identifiable, Codable {
     var isRead: Bool
     var isStarred: Bool
     var isHighlighted: Bool
+    var isOfflineCached: Bool
     var dateAdded: Date
     var deletedDate: Date?
 
@@ -28,6 +29,7 @@ struct SavedLink: Identifiable, Codable {
         isRead: Bool = false,
         isStarred: Bool = false,
         isHighlighted: Bool = false,
+        isOfflineCached: Bool = false,
         dateAdded: Date = Date(),
         deletedDate: Date? = nil
     ) {
@@ -39,6 +41,7 @@ struct SavedLink: Identifiable, Codable {
         self.isRead = isRead
         self.isStarred = isStarred
         self.isHighlighted = isHighlighted
+        self.isOfflineCached = isOfflineCached
         self.dateAdded = dateAdded
         self.deletedDate = deletedDate
     }
