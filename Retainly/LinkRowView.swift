@@ -28,6 +28,15 @@ struct LinkRowView: View {
                     .lineLimit(4)
 
                 HStack(spacing: 12) {
+                    if link.contentType == .image {
+                        HStack(spacing: 4) {
+                            Image(systemName: "photo")
+                            Text("Image")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.purple)
+                    }
+
                     if link.isStarred {
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
@@ -68,30 +77,68 @@ struct LinkRowView: View {
 
     @ViewBuilder
     private var thumbnail: some View {
-        if let thumbnailURL = link.thumbnailURL {
-            AsyncImage(url: thumbnailURL) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.gray.opacity(0.1))
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                case .failure:
-                    placeholderImage
-                @unknown default:
-                    placeholderImage
+        switch link.contentType {
+        case .image:
+            // Load local image from App Group storage
+            if let imagePath = link.localImagePath,
+               let thumbnailURL = getLocalImageURL(imagePath) {
+                AsyncImage(url: thumbnailURL) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    case .failure:
+                        placeholderImage(systemName: "photo.fill")
+                    @unknown default:
+                        placeholderImage(systemName: "photo.fill")
+                    }
                 }
+            } else {
+                placeholderImage(systemName: "photo.fill")
             }
-        } else {
-            placeholderImage
+
+        case .link:
+            // Load remote thumbnail URL for links
+            if let thumbnailURL = link.thumbnailURL {
+                AsyncImage(url: thumbnailURL) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    case .failure:
+                        placeholderImage(systemName: "link.circle.fill")
+                    @unknown default:
+                        placeholderImage(systemName: "link.circle.fill")
+                    }
+                }
+            } else {
+                placeholderImage(systemName: "link.circle.fill")
+            }
         }
     }
 
-    private var placeholderImage: some View {
-        Image(systemName: "link.circle.fill")
+    private func getLocalImageURL(_ imagePath: String) -> URL? {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.rahul.retainly"
+        ) else {
+            return nil
+        }
+
+        return containerURL.appendingPathComponent(imagePath)
+    }
+
+    private func placeholderImage(systemName: String) -> some View {
+        Image(systemName: systemName)
             .font(.largeTitle)
             .foregroundStyle(.tint)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

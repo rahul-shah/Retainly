@@ -11,6 +11,7 @@ struct CategoryDetailView: View {
     let category: SidebarCategory
     @ObservedObject var linkStore: LinkStore
     @State private var selectedLink: SavedLink?
+    @State private var selectedImageLink: SavedLink?
 
     var filteredLinks: [SavedLink] {
         linkStore.filteredLinks(for: category)
@@ -24,7 +25,12 @@ struct CategoryDetailView: View {
                 List {
                     ForEach(filteredLinks) { link in
                         Button {
-                            selectedLink = link
+                            // Route based on content type
+                            if link.contentType == .image {
+                                selectedImageLink = link
+                            } else {
+                                selectedLink = link
+                            }
                         } label: {
                             LinkRowView(link: link)
                         }
@@ -66,6 +72,9 @@ struct CategoryDetailView: View {
         }
         .sheet(item: $selectedLink) { link in
             WebViewContainer(link: link, linkStore: linkStore)
+        }
+        .fullScreenCover(item: $selectedImageLink) { link in
+            ImageViewerContainer(link: link, linkStore: linkStore)
         }
     }
 

@@ -9,6 +9,12 @@ import UIKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum SharedContentType {
+    case url(URL)
+    case image(Data, fileName: String)
+    case imageURL(URL)
+}
+
 class ShareViewController: UIViewController {
     private let linksKey = "savedLinks"
     private let iCloudStore = NSUbiquitousKeyValueStore.default
@@ -45,60 +51,239 @@ class ShareViewController: UIViewController {
             return
         }
 
-        if itemProvider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-            itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil, completionHandler: { [weak self] (item, error) in
-                guard let self = self else { return }
+        Task {
+            await detectAndHandleContent(itemProvider: itemProvider)
+        }
+    }
 
+    private func detectAndHandleContent(itemProvider: NSItemProvider) async {
+        // Priority: image > URL > text
+        if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            await handleImageContent(itemProvider: itemProvider)
+        } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+            await handleURLContent(itemProvider: itemProvider)
+        } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.text.identifier) {
+            await handleTextContent(itemProvider: itemProvider)
+        } else {
+            await MainActor.run {
+                showError("Unsupported content type")
+            }
+        }
+    }
+
+    private func handleImageContent(itemProvider: NSItemProvider) async {
+        await MainActor.run {
+            messageLabel.text = "Loading image..."
+        }
+
+        guard let imageData = await loadImageData(from: itemProvider) else {
+            await MainActor.run {
+                showError("Failed to load image")
+            }
+            return
+        }
+
+        await saveImageToRetainly(imageData: imageData.data, fileName: imageData.fileName)
+    }
+
+    private func handleURLContent(itemProvider: NSItemProvider) async {
+        guard let url = await loadURL(from: itemProvider) else {
+            await MainActor.run {
+                showError("Could not extract URL")
+            }
+            return
+        }
+
+        // Check if URL is an image URL
+        if isImageURL(url) {
+            await downloadAndSaveImage(from: url)
+        } else {
+            await fetchMetadataAndSave(url: url)
+        }
+    }
+
+    private func handleTextContent(itemProvider: NSItemProvider) async {
+        guard let url = await loadURLFromText(from: itemProvider) else {
+            await MainActor.run {
+                showError("Could not extract URL from text")
+            }
+            return
+        }
+
+        if isImageURL(url) {
+            await downloadAndSaveImage(from: url)
+        } else {
+            await fetchMetadataAndSave(url: url)
+        }
+    }
+
+    private func loadImageData(from itemProvider: NSItemProvider) async -> (data: Data, fileName: String)? {
+        return await withCheckedContinuation { continuation in
+            itemProvider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, error in
                 if let error = error {
-                    print("Error loading item: \(error.localizedDescription)")
-                    DispatchQueue.main.async {
-                        self.showError("Error: \(error.localizedDescription)")
-                    }
+                    print("Error loading image: \(error)")
+                    continuation.resume(returning: nil)
                     return
                 }
 
-                var urlToSave: URL?
+                if let url = item as? URL {
+                    // Image file URL (Photos app, Files app)
+                    if let data = try? Data(contentsOf: url) {
+                        let fileName = url.lastPathComponent
+                        continuation.resume(returning: (data, fileName))
+                    } else {
+                        continuation.resume(returning: nil)
+                    }
+                } else if let data = item as? Data {
+                    // Direct image data
+                    continuation.resume(returning: (data, "image.jpg"))
+                } else if let image = item as? UIImage,
+                          let data = image.jpegData(compressionQuality: 0.9) {
+                    // UIImage object
+                    continuation.resume(returning: (data, "image.jpg"))
+                } else {
+                    print("Unknown image item type: \(type(of: item))")
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    private func loadURL(from itemProvider: NSItemProvider) async -> URL? {
+        return await withCheckedContinuation { continuation in
+            itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, error in
+                if let error = error {
+                    print("Error loading URL: \(error)")
+                    continuation.resume(returning: nil)
+                    return
+                }
 
                 if let url = item as? URL {
-                    urlToSave = url
-                    print("Extracted URL directly: \(url)")
+                    continuation.resume(returning: url)
                 } else if let data = item as? Data, let url = URL(dataRepresentation: data, relativeTo: nil) {
-                    urlToSave = url
-                    print("Extracted URL from data: \(url)")
+                    continuation.resume(returning: url)
                 } else if let urlString = item as? String, let url = URL(string: urlString) {
-                    urlToSave = url
-                    print("Extracted URL from string: \(url)")
+                    continuation.resume(returning: url)
                 } else {
-                    print("Failed to extract URL. Item type: \(type(of: item))")
+                    continuation.resume(returning: nil)
                 }
+            }
+        }
+    }
 
-                if let url = urlToSave {
-                    Task {
-                        await self.fetchMetadataAndSave(url: url)
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.showError("Could not extract URL")
-                    }
-                }
-            })
-        } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.text.identifier) {
-            itemProvider.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil, completionHandler: { [weak self] (item, error) in
-                guard let self = self else { return }
-
+    private func loadURLFromText(from itemProvider: NSItemProvider) async -> URL? {
+        return await withCheckedContinuation { continuation in
+            itemProvider.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { item, error in
                 if let urlString = item as? String, let url = URL(string: urlString) {
-                    print("Extracted URL from text: \(url)")
-                    Task {
-                        await self.fetchMetadataAndSave(url: url)
-                    }
+                    continuation.resume(returning: url)
                 } else {
-                    DispatchQueue.main.async {
-                        self.showError("Could not extract URL from text")
-                    }
+                    continuation.resume(returning: nil)
                 }
-            })
-        } else {
-            showError("Please share a web page or URL")
+            }
+        }
+    }
+
+    private func isImageURL(_ url: URL) -> Bool {
+        let imageExtensions = ["jpg", "jpeg", "png", "gif", "heic", "heif", "webp"]
+        let pathExtension = url.pathExtension.lowercased()
+        return imageExtensions.contains(pathExtension)
+    }
+
+    private func downloadAndSaveImage(from url: URL) async {
+        await MainActor.run {
+            messageLabel.text = "Downloading image..."
+        }
+
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                await MainActor.run {
+                    showError("Failed to download image")
+                }
+                return
+            }
+
+            let fileName = url.lastPathComponent
+            await saveImageToRetainly(imageData: data, fileName: fileName)
+        } catch {
+            print("Error downloading image: \(error)")
+            await MainActor.run {
+                showError("Failed to download image")
+            }
+        }
+    }
+
+    private func saveImageToRetainly(imageData: Data, fileName: String) async {
+        await MainActor.run {
+            messageLabel.text = "Saving image..."
+        }
+
+        let linkId = UUID()
+        let format = ImageFormat.detect(from: imageData)
+
+        do {
+            // Save image using ImageStorageManager
+            let metadata = try await ImageStorageManager.shared.saveImage(imageData, for: linkId, format: format)
+
+            // Extract title from filename
+            let title = (fileName as NSString).deletingPathExtension
+            let cleanTitle = title.isEmpty ? "Saved Image" : title
+
+            // Create SavedLink for the image
+            let link = SavedLink.createImageLink(
+                id: linkId,
+                imagePath: metadata.originalPath,
+                title: cleanTitle,
+                imageSize: metadata.size,
+                imageFormat: metadata.format
+            )
+
+            // Save to iCloud
+            await saveLink(link)
+        } catch {
+            print("Error saving image: \(error)")
+            await MainActor.run {
+                showError("Failed to save image")
+            }
+        }
+    }
+
+    private func saveLink(_ link: SavedLink) async {
+        print("📱 Saving link to iCloud...")
+
+        // Force synchronize before reading
+        let syncResult = iCloudStore.synchronize()
+        print("iCloud sync before read: \(syncResult)")
+
+        var links: [SavedLink] = []
+        if let data = iCloudStore.data(forKey: linksKey) {
+            do {
+                links = try JSONDecoder().decode([SavedLink].self, from: data)
+                print("✓ Loaded \(links.count) existing links")
+            } catch {
+                print("❌ Failed to decode links: \(error)")
+            }
+        }
+
+        links.insert(link, at: 0)
+
+        do {
+            let encoded = try JSONEncoder().encode(links)
+            iCloudStore.set(encoded, forKey: linksKey)
+            iCloudStore.synchronize()
+
+            print("✅ Saved successfully to iCloud")
+
+            await MainActor.run {
+                showSuccess()
+            }
+        } catch {
+            print("❌ Failed to save: \(error)")
+            await MainActor.run {
+                showError("Failed to save")
+            }
         }
     }
 
@@ -137,53 +322,8 @@ class ShareViewController: UIViewController {
             isRead: false
         )
 
-        // Save to iCloud
-        print("📱 Attempting to save to iCloud...")
-
-        // Force synchronize before reading
-        let syncResult = iCloudStore.synchronize()
-        print("iCloud sync before read: \(syncResult)")
-
-        var links: [SavedLink] = []
-        if let data = iCloudStore.data(forKey: linksKey) {
-            print("✓ Found existing data in iCloud (\(data.count) bytes)")
-
-            do {
-                let decodedLinks = try JSONDecoder().decode([SavedLink].self, from: data)
-                links = decodedLinks
-                print("✓ Loaded \(links.count) existing links from iCloud")
-            } catch {
-                print("❌ Failed to decode existing links: \(error)")
-            }
-        } else {
-            print("ℹ️ No existing data in iCloud, starting fresh")
-        }
-
-        links.insert(link, at: 0)
-        print("📝 New links count: \(links.count)")
-
-        do {
-            let encoded = try JSONEncoder().encode(links)
-            print("✓ Encoded \(links.count) links (\(encoded.count) bytes)")
-
-            iCloudStore.set(encoded, forKey: linksKey)
-            print("✓ Set data in iCloud store")
-
-            let syncAfterResult = iCloudStore.synchronize()
-            print("✓ iCloud sync after write: \(syncAfterResult)")
-
-            print("✅ Link saved successfully to iCloud: \(url)")
-            print("Total links in iCloud: \(links.count)")
-
-            await MainActor.run {
-                showSuccess()
-            }
-        } catch {
-            print("❌ Failed to encode/save links: \(error)")
-            await MainActor.run {
-                showError("Failed to save: \(error.localizedDescription)")
-            }
-        }
+        // Save to iCloud using shared method
+        await saveLink(link)
     }
 
     private func showSuccess() {

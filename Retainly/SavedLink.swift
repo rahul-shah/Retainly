@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum SavedContentType: String, Codable {
+    case link
+    case image
+}
+
 struct SavedLink: Identifiable, Codable {
     let id: UUID
     let url: URL
@@ -20,6 +25,12 @@ struct SavedLink: Identifiable, Codable {
     var dateAdded: Date
     var deletedDate: Date?
 
+    // NEW: Image-specific properties
+    let contentType: SavedContentType
+    let localImagePath: String?
+    let imageSize: CGSize?
+    let imageFormat: String?
+
     init(
         id: UUID = UUID(),
         url: URL,
@@ -31,7 +42,11 @@ struct SavedLink: Identifiable, Codable {
         isHighlighted: Bool = false,
         isOfflineCached: Bool = false,
         dateAdded: Date = Date(),
-        deletedDate: Date? = nil
+        deletedDate: Date? = nil,
+        contentType: SavedContentType = .link,
+        localImagePath: String? = nil,
+        imageSize: CGSize? = nil,
+        imageFormat: String? = nil
     ) {
         self.id = id
         self.url = url
@@ -44,6 +59,10 @@ struct SavedLink: Identifiable, Codable {
         self.isOfflineCached = isOfflineCached
         self.dateAdded = dateAdded
         self.deletedDate = deletedDate
+        self.contentType = contentType
+        self.localImagePath = localImagePath
+        self.imageSize = imageSize
+        self.imageFormat = imageFormat
     }
 }
 
@@ -94,4 +113,28 @@ extension SavedLink {
             deletedDate: Date()
         )
     ]
+}
+
+// MARK: - Image Link Factory
+extension SavedLink {
+    static func createImageLink(
+        id: UUID = UUID(),
+        imagePath: String,
+        title: String,
+        excerpt: String? = nil,
+        imageSize: CGSize,
+        imageFormat: String
+    ) -> SavedLink {
+        return SavedLink(
+            id: id,
+            url: URL(string: "local://image/\(id.uuidString)")!,
+            title: title,
+            excerpt: excerpt ?? "Image saved on \(Date().formatted(date: .abbreviated, time: .shortened))",
+            thumbnailURL: nil,
+            contentType: .image,
+            localImagePath: imagePath,
+            imageSize: imageSize,
+            imageFormat: imageFormat
+        )
+    }
 }

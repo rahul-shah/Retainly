@@ -14,11 +14,13 @@ class LinkStore: ObservableObject {
     private let iCloudStore = NSUbiquitousKeyValueStore.default
     private let appGroupIdentifier = "group.com.rahul.retainly"
     private let migrationKey = "didMigrateToiCloud"
+    private let contentTypeMigrationKey = "didMigrateContentType"
 
     @Published var links: [SavedLink] = []
 
     init() {
         migrateFromAppGroupIfNeeded()
+        migrateToContentType()
         setupiCloudSync()
         loadLinks()
     }
@@ -57,6 +59,22 @@ class LinkStore: ObservableObject {
         } else {
             print("Failed to encode links for migration")
         }
+    }
+
+    private func migrateToContentType() {
+        // Check if content type migration already happened
+        if iCloudStore.bool(forKey: contentTypeMigrationKey) {
+            print("✓ Content type migration already completed")
+            return
+        }
+
+        print("🔄 Performing content type migration...")
+
+        // Mark as migrated - existing links default to .link type via Codable
+        iCloudStore.set(true, forKey: contentTypeMigrationKey)
+        iCloudStore.synchronize()
+
+        print("✅ Content type migration complete")
     }
 
     private func setupiCloudSync() {
