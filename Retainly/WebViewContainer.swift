@@ -157,7 +157,8 @@ struct WebViewContainer: View {
     }
 
     private func markAsRead() {
-        var updatedLink = link
+        // IMPORTANT: Use currentLink to preserve any changes (like star status)
+        var updatedLink = currentLink ?? link
         updatedLink.isRead = true
         linkStore.updateLink(updatedLink)
     }
