@@ -29,21 +29,30 @@ struct LinkRowView: View {
 
                 HStack(spacing: 12) {
                     if link.isStarred {
-                        Label("Starred", systemImage: "star.fill")
-                            .font(.caption)
-                            .foregroundStyle(.yellow)
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                            Text("Starred")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.yellow)
                     }
 
                     if link.isHighlighted {
-                        Label("Highlighted", systemImage: "highlighter")
-                            .font(.caption)
-                            .foregroundStyle(.orange)
+                        HStack(spacing: 4) {
+                            Image(systemName: "highlighter")
+                            Text("Highlighted")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                     }
 
                     if link.isOfflineCached {
-                        Label("Offline", systemImage: "arrow.down.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.green)
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.down.circle.fill")
+                            Text("Offline")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.green)
                     }
 
                     Spacer()
