@@ -139,11 +139,13 @@ class LinkStore: ObservableObject {
         var updatedLink = link
         updatedLink.deletedDate = Date()
         updateLink(updatedLink)
+        print("🗑️ LinkStore: Moved '\(link.title)' to Recently Deleted")
     }
 
     func permanentlyDeleteLink(_ link: SavedLink) {
         links.removeAll { $0.id == link.id }
         saveLinks()
+        print("💥 LinkStore: Permanently deleted '\(link.title)'")
     }
 
     func filteredLinks(for category: SidebarCategory) -> [SavedLink] {

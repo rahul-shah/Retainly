@@ -30,6 +30,28 @@ struct CategoryDetailView: View {
                         }
                         .buttonStyle(.plain)
                         .listRowSeparator(.visible)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            if category == .recentlyDeleted {
+                                Button(role: .destructive) {
+                                    linkStore.permanentlyDeleteLink(link)
+                                } label: {
+                                    Label("Delete", systemImage: "trash.fill")
+                                }
+
+                                Button {
+                                    restoreLink(link)
+                                } label: {
+                                    Label("Restore", systemImage: "arrow.uturn.backward")
+                                }
+                                .tint(.blue)
+                            } else {
+                                Button(role: .destructive) {
+                                    linkStore.deleteLink(link)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -45,6 +67,12 @@ struct CategoryDetailView: View {
         .sheet(item: $selectedLink) { link in
             WebViewContainer(link: link, linkStore: linkStore)
         }
+    }
+
+    private func restoreLink(_ link: SavedLink) {
+        var restoredLink = link
+        restoredLink.deletedDate = nil
+        linkStore.updateLink(restoredLink)
     }
 
     private var emptyStateView: some View {
