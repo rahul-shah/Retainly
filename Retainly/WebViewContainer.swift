@@ -19,12 +19,14 @@ struct WebViewContainer: View {
     @State private var isReaderMode = false
     @State private var articleContent: ArticleContent?
     @State private var extractionFailed = false
-    @State private var isStarred: Bool
 
-    init(link: SavedLink, linkStore: LinkStore) {
-        self.link = link
-        self.linkStore = linkStore
-        _isStarred = State(initialValue: link.isStarred)
+    // Computed property that always reflects the current state from linkStore
+    private var currentLink: SavedLink? {
+        linkStore.links.first(where: { $0.id == link.id })
+    }
+
+    private var isStarred: Bool {
+        currentLink?.isStarred ?? link.isStarred
     }
 
     var body: some View {
@@ -74,7 +76,7 @@ struct WebViewContainer: View {
                 // Floating action bar at the bottom
                 VStack {
                     Spacer()
-                    FloatingActionBar(isStarred: $isStarred, onStarTap: toggleStar)
+                    FloatingActionBar(isStarred: isStarred, onStarTap: toggleStar)
                         .padding(.bottom, 50) // Space for the toolbar
                 }
             }
@@ -154,12 +156,12 @@ struct WebViewContainer: View {
     }
 
     private func toggleStar() {
+        var updatedLink = currentLink ?? link
+        updatedLink.isStarred.toggle()
+
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            isStarred.toggle()
+            linkStore.updateLink(updatedLink)
         }
-        var updatedLink = link
-        updatedLink.isStarred = isStarred
-        linkStore.updateLink(updatedLink)
     }
 
     private func loadCachedArticleContent() async {
@@ -291,7 +293,7 @@ struct WebView: UIViewRepresentable {
 }
 
 struct FloatingActionBar: View {
-    @Binding var isStarred: Bool
+    let isStarred: Bool
     let onStarTap: () -> Void
     @Environment(\.colorScheme) private var colorScheme
 
