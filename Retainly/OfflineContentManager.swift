@@ -11,6 +11,7 @@ import WebKit
 struct OfflineMetadata: Codable {
     let fileURL: String
     let savedDate: TimeInterval
+    let hasArticleContent: Bool
 }
 
 actor OfflineContentManager {
@@ -22,7 +23,7 @@ actor OfflineContentManager {
 
     private init() {}
 
-    func saveContent(for link: SavedLink) async {
+    func saveContent(for link: SavedLink, articleContent: ArticleContent? = nil) async {
         print("Saving offline content for: \(link.url)")
 
         do {
@@ -57,8 +58,19 @@ actor OfflineContentManager {
             // Save HTML content
             try data.write(to: fileURL)
 
+            // Save article content if provided
+            var hasArticleContent = false
+            if let article = articleContent {
+                let articleFileName = link.id.uuidString + "_article.json"
+                let articleFileURL = offlineFolder.appendingPathComponent(articleFileName)
+                let articleData = try JSONEncoder().encode(article)
+                try articleData.write(to: articleFileURL)
+                hasArticleContent = true
+                print("Successfully saved article content")
+            }
+
             // Update metadata
-            await saveOfflineMetadata(linkId: link.id, fileURL: fileURL)
+            await saveOfflineMetadata(linkId: link.id, fileURL: fileURL, hasArticleContent: hasArticleContent)
 
             print("Successfully saved offline content to: \(fileURL.path)")
         } catch {
@@ -88,24 +100,80 @@ actor OfflineContentManager {
         await getOfflineContent(for: linkId) != nil
     }
 
+    func getOfflineArticleContent(for linkId: UUID) async -> ArticleContent? {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) else {
+            return nil
+        }
+
+        let offlineFolder = containerURL.appendingPathComponent("OfflineContent", isDirectory: true)
+        let fileName = linkId.uuidString + "_article.json"
+        let fileURL = offlineFolder.appendingPathComponent(fileName)
+
+        guard FileManager.default.fileExists(atPath: fileURL.path),
+              let data = try? Data(contentsOf: fileURL),
+              let article = try? JSONDecoder().decode(ArticleContent.self, from: data) else {
+            return nil
+        }
+
+        return article
+    }
+
     func deleteOfflineContent(for linkId: UUID) async {
         guard let fileURL = await getOfflineContent(for: linkId) else {
             return
         }
 
         do {
+            // Delete HTML file
             try FileManager.default.removeItem(at: fileURL)
+
+            // Also delete article content if it exists
+            if let containerURL = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: appGroupIdentifier
+            ) {
+                let offlineFolder = containerURL.appendingPathComponent("OfflineContent", isDirectory: true)
+                let articleFileName = linkId.uuidString + "_article.json"
+                let articleFileURL = offlineFolder.appendingPathComponent(articleFileName)
+
+                if FileManager.default.fileExists(atPath: articleFileURL.path) {
+                    try? FileManager.default.removeItem(at: articleFileURL)
+                }
+            }
+
             print("Deleted offline content for link: \(linkId)")
         } catch {
             print("Error deleting offline content: \(error.localizedDescription)")
         }
     }
 
-    private func saveOfflineMetadata(linkId: UUID, fileURL: URL) async {
+    func getArticleContent(for linkId: UUID) async -> ArticleContent? {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) else {
+            return nil
+        }
+
+        let offlineFolder = containerURL.appendingPathComponent("OfflineContent", isDirectory: true)
+        let articleFileName = linkId.uuidString + "_article.json"
+        let articleFileURL = offlineFolder.appendingPathComponent(articleFileName)
+
+        guard FileManager.default.fileExists(atPath: articleFileURL.path),
+              let data = try? Data(contentsOf: articleFileURL),
+              let article = try? JSONDecoder().decode(ArticleContent.self, from: data) else {
+            return nil
+        }
+
+        return article
+    }
+
+    private func saveOfflineMetadata(linkId: UUID, fileURL: URL, hasArticleContent: Bool) async {
         var metadata = loadOfflineMetadata()
         metadata[linkId.uuidString] = OfflineMetadata(
             fileURL: fileURL.path,
-            savedDate: Date().timeIntervalSince1970
+            savedDate: Date().timeIntervalSince1970,
+            hasArticleContent: hasArticleContent
         )
 
         if let encoded = try? JSONEncoder().encode(metadata) {
