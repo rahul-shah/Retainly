@@ -19,14 +19,11 @@ struct WebViewContainer: View {
     @State private var isReaderMode = false
     @State private var articleContent: ArticleContent?
     @State private var extractionFailed = false
+    @State private var isStarred = false
 
     // Computed property that always reflects the current state from linkStore
     private var currentLink: SavedLink? {
         linkStore.links.first(where: { $0.id == link.id })
-    }
-
-    private var isStarred: Bool {
-        currentLink?.isStarred ?? link.isStarred
     }
 
     var body: some View {
@@ -82,6 +79,16 @@ struct WebViewContainer: View {
             }
             .navigationTitle(link.title)
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                // Initialize star state from current link in store
+                isStarred = currentLink?.isStarred ?? link.isStarred
+            }
+            .onChange(of: currentLink?.isStarred) { oldValue, newValue in
+                // Update local state when store changes
+                if let newValue = newValue {
+                    isStarred = newValue
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") {
@@ -159,9 +166,14 @@ struct WebViewContainer: View {
         var updatedLink = currentLink ?? link
         updatedLink.isStarred.toggle()
 
+        // Update local state immediately for responsive UI
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            linkStore.updateLink(updatedLink)
+            isStarred = updatedLink.isStarred
         }
+
+        // Update store and sync to iCloud
+        linkStore.updateLink(updatedLink)
+        print("⭐ Toggled star for '\(link.title)' to: \(updatedLink.isStarred)")
     }
 
     private func loadCachedArticleContent() async {

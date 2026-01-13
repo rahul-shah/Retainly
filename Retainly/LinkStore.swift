@@ -106,10 +106,14 @@ class LinkStore: ObservableObject {
         do {
             let data = try JSONEncoder().encode(links)
             iCloudStore.set(data, forKey: linksKey)
-            iCloudStore.synchronize()
-            print("LinkStore: Saved \(links.count) links to iCloud")
+            let syncResult = iCloudStore.synchronize()
+            print("💾 LinkStore: Saved \(links.count) links to iCloud (sync: \(syncResult))")
+
+            // Debug: Print starred links
+            let starredCount = links.filter { $0.isStarred && $0.deletedDate == nil }.count
+            print("   ⭐ Starred links: \(starredCount)")
         } catch {
-            print("Error saving links to iCloud: \(error)")
+            print("❌ Error saving links to iCloud: \(error)")
         }
     }
 
@@ -120,8 +124,14 @@ class LinkStore: ObservableObject {
 
     func updateLink(_ link: SavedLink) {
         if let index = links.firstIndex(where: { $0.id == link.id }) {
+            let oldLink = links[index]
             links[index] = link
             saveLinks()
+            print("📝 LinkStore: Updated link '\(link.title)'")
+            print("   - isStarred: \(oldLink.isStarred) → \(link.isStarred)")
+            print("   - isRead: \(oldLink.isRead) → \(link.isRead)")
+        } else {
+            print("⚠️ LinkStore: Could not find link to update (ID: \(link.id))")
         }
     }
 
